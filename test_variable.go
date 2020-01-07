@@ -133,6 +133,10 @@ func TypeTranslate(){
 	fmt.Println(b)
 }
 
+func TestCommit(){
+	fmt.Println("github commit")
+}
+
 func main() {
 	//otherVariableSet()
 	//simpleShortDecarationRight()
