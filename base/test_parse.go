@@ -1,6 +1,6 @@
 package main
 /**
-	parse系列
+	parse系列：解析 使用strconv
 */
 import (
 	"fmt"

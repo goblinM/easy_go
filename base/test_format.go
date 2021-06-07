@@ -6,8 +6,19 @@ import (
 )
 
 /**
-	format 系列
+	format 系列: 格式化，使用strconv
+	Sprintf 格式化字符串并赋值给新串
 */
+
+func TestFormatString() {
+	// Sprintf 格式化字符串并赋值给新串
+	name := "Mary"
+	age := 20
+	word := "my name is %s, i'm %d years old!"
+	var introduce = fmt.Sprintf(word, name, age)
+	fmt.Println(introduce)
+}
+
 func TestFormatBool(){
 	// bool 转字符串
 	num := true
@@ -51,6 +62,7 @@ func TestAppend(){
 }
 
 func main() {
+	TestFormatString()
 	TestFormatBool()
 	TestFormatInt()
 	TestFormatUint()

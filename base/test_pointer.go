@@ -6,7 +6,7 @@ import (
 )
 
 /**
-指针
+指针: & 取指针地址   * 取指针的值
 */
 func GetPtrValue(){
 	/**
@@ -25,6 +25,21 @@ func GetPtrValue(){
 	fmt.Printf("value type:%T\n",value)
 	// 打印取值后的值
 	fmt.Printf("value is:%s\n", value)
+}
+
+/**
+指针数组
+*/
+const MAX  = 3
+func TestPtrArray() {
+	a:= [...] int {100, 200, 300}
+	var ptr [MAX] *int
+	for i:=0; i < MAX; i++ {
+		ptr[i] = &a[i] /* 整数地址赋值给指针数组 */
+	}
+	for i:=0; i < MAX; i++ {
+		fmt.Printf("a[%d] = %d \n", *ptr[i])
+	}
 }
 
 func swap(a,b *int){
@@ -81,4 +96,5 @@ func main() {
 	GetPtrValue()
 	TestSwap()
 	FlagPtr()
+	TestPtrArray()
 }
