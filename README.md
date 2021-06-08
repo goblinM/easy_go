@@ -1,2 +1,6 @@
 # easy_go
-用于学习golang
+学习golang
+
+运行go文件：go run hello.go
+
+生成go二进制文件： go build hello.go
