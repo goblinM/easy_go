@@ -25,4 +25,6 @@ func main() {
 	book_obj.subject = "a classics story"
 	book_obj.book_id = 1
 	printBook(&book_obj)
+	book2 := Books{title:"abc", author:"kk", subject:"sdasca", book_id:12314}
+	printBook(&book2)
 }
