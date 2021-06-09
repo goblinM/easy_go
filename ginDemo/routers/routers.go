@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"ginDemo/app/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,6 +14,9 @@ func Include(opts ...Option) {
 // 初始化
 func Init() *gin.Engine {
 	r := gin.New()
+	// 注册中间件
+	//r.Use(middlewares.GlobalMiddleWare())
+	r.Use(middlewares.GlobalUseTime())
 	for _, opt := range options {
 		opt(r)
 	}

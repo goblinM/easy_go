@@ -1,4 +1,4 @@
-# Gin 使用
+# Gin 快速使用
 #### 基础命令以及使用
 ```
 1.go env 查看go的环境配置
@@ -250,4 +250,167 @@
             })
         
             r.Run(":8000")
+```
+#### 中间件
+```
+    1.全局中间件
+        所有的请求都会经过此中间件，再去到对应的接口
+        中间件写法：
+        // middleware.go 写入
+        func MiddleWare() gin.HandlerFunc {
+            return func(c *gin.Context) {
+                //业务处理逻辑
+            }
+        }
+        // main.go
+        // 注册中间件：没有进行路由拆分就在main.go, 如果拆分了后在routers.go中
+        r := gin.Default()
+        r.Use(MiddleWare())
+    2.Next()方法
+        // middleware.go 中写入
+        c.Next()
+    3.局部中间件
+        定义好一个局部中间件函数
+        然后直接在路由注册的时候直接使用，则可当成局部中间件使用
+        //
+        func PartMiddleWare() gin.HandlerFunc {
+            return func(c *gin.Context) {
+                //业务处理逻辑
+            }
+        }
+        // main.go
+        r := gin.Default()
+        r.GET("/test", PartMiddleWare(), func(c *gin.Context){})
+```
+#### 会话控制
+```
+    1.cookie
+        介绍：
+            Cookie是解决HTTP协议无状态的方案之一
+            Cookie实际上就是服务器保存在浏览器上的一段信息。浏览器有了Cookie之后，每次向服务器发送请求时都会同时将该信息发送给服务器，服务器收到请求后，就可以根据该信息处理请求
+            Cookie由服务器创建，并发送给浏览器，最终由浏览器保存
+        用途：测试服务端发送cookie给客户端，客户端请求时携带cookie
+        获取： context.Cookie("key_cookie")
+        设置： 
+            // 给客户端设置cookie
+            //  maxAge int, 单位为秒
+            // path,cookie所在目录
+            // domain string,域名
+            // secure 是否智能通过https访问
+            // httpOnly bool  是否允许别人通过js获取自己的cookie
+            c.SetCookie("key_cookie", "value_cookie", 60, "/",
+                "localhost", false, true)
+            }
+        缺点：
+            不安全，明文
+            增加带宽消耗
+            可以被禁用
+            cookie有上限
+    2.session
+        官网地址：http://www.gorillatoolkit.org/pkg/sessions
+        简单示例：/easy_go/ginDemo/app/middlewares/session.go
+        gorilla/sessions为自定义session后端提供cookie和文件系统session以及基础结构
+        主要功能：
+            1.可用于设置签名
+            2.内置的后端可将session存储在cookie或文件系统中。
+            3.Flash消息：一直持续读取的session值。
+            4.切换session持久性（又称“记住我”）和设置其他属性的便捷方法。
+            5.旋转身份验证和加密密钥的机制。
+            6.每个请求有多个session，即使使用不同的后端也是如此。
+            7.自定义session后端的接口和基础结构：可以使用通用API检索并批量保存来自不同商店的session。
+```
+#### 参数验证
+``` 
+    1.结构体验证
+        type Person struct {
+            //不能为空并且大于10
+            Age      int       `form:"age" binding:"required,gt=10"`
+        }
+        func main() {
+            r := gin.Default()
+            r.GET("/struct_auth", func(c *gin.Context) {
+                var person Person
+                if err := c.ShouldBind(&person); err != nil {
+                    c.String(500, fmt.Sprint(err))
+                    return
+                }
+                c.String(200, fmt.Sprintf("%#v", person))
+            })
+            r.Run()
+        }
+    2.自定义验证:
+        参考：http://www.topgoer.com/gin框架/参数验证/自定义验证.html
+        // 1、自定义的校验方法
+        func nameNotNullAndAdmin(v *validator.Validate, topStruct reflect.Value, currentStructOrField reflect.Value, field reflect.Value, fieldType reflect.Type, fieldKind reflect.Kind, param string) bool {
+            if value, ok := field.Interface().(string); ok {
+                // 字段不能为空，并且不等于  admin
+                return value != "" && !("5lmh" == value)
+            }
+            return true
+        }
+         // 3、将我们自定义的校验方法注册到 validator中
+        if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+            // 这里的 key 和 fn 可以不一样最终在 struct 使用的是 key
+            v.RegisterValidation("NotNullAndAdmin", nameNotNullAndAdmin)
+        }
+    3.多语言翻译验证
+```
+#### 日志文件
+```
+    gin.DisableConsoleColor()
+    // Logging to a file.
+    f, _ := os.Create("gin.log")
+    gin.DefaultWriter = io.MultiWriter(f)
+    // 如果需要同时将日志写入文件和控制台，请使用以下代码。
+    // gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
+```
+#### 实时加载
+```
+    参考：https://www.jianshu.com/p/d7916f21d38c
+    1.Air:
+        Air能够实时监听项目的代码文件，在代码发生变更之后自动重新编译并执行，大大提高gin框架项目的开发效率
+        Air 特性：    
+            1.彩色日志输出
+            2.自定义构建或二进制命令
+            3.支持忽略子目录
+            4.启动后支持监听新目录
+            5.更好的构建过程
+        安装： go get -u github.com/cosmtrek/air
+        
+    2.Fresh
+        github地址：https://github.com/gravityblast/fresh
+        Fresh是一个命令行工具，每次保存Go或模版文件时，该工具都会生成或重新启动Web应用程序。
+        Fresh将监视文件事件，并且每次创建/修改/删除文件时，Fresh都会生成并重新启动应用程序。
+        如果go build返回错误，它会将记录在tmp文件夹中。
+        安装：go get -u github.com/pilu/fresh
+        使用：进入你的项目目录 然后执行 fresh
+    3.bee
+        github地址：https://github.com/beego/bee
+        安装：go get -u github.com/beego/bee
+        使用：进入你的项目目录 然后执行 bee run
+    4.gowatch 
+        github地址：https://github.com/silenceper/gowatch
+        安装：go get github.com/silenceper/gowatch
+        使用： gowatch -o ./bin/demo -p ./cmd/demo
+            -o : 非必须，指定build的目标文件路径
+            -p : 非必须，指定需要build的package（也可以是单个文件）
+            -args: 非必须，指定程序运行时参数，例如：-args='-host=:8080,-name=demo'
+            -v: 非必须，显示gowatch版本信息
+    5.gin
+        github地址:https://github.com/codegangsta/gin
+        安装： go get github.com/codegangsta/gin
+        使用：gin run main.go    
+    6.realize
+        github地址：https://github.com/oxequa/realize
+        安装：go get github.com/oxequa/realize
+             或者  GO111MODULE=off go get github.com/oxequa/realize
+        使用：
+            # 首先进行初始化 默认配置即可
+            $ realize init
+            # 执行项目
+            $ realize start
+            # 添加命令
+            $ realize add
+            # 删除命令
+            $ realize init
 ```
