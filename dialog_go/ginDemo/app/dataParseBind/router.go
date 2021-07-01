@@ -2,7 +2,7 @@ package dataParseBind
 
 import "github.com/gin-gonic/gin"
 
-func Routers(e *gin.Engine)  {
+func Routers(e *gin.Engine) {
 	e.POST("loginJSON", JSONHandler)
 	// 校验： curl http://localhost:8000/loginJSON -H 'content-type:application/json' -d {"user":"root", "password":"admin"} -X POST
 	// curl http://localhost:8000/loginJSON -H 'content-type:application/json' -d "{\"user\":\"root\", \"password\":\"admin\"}" -X POST
@@ -14,4 +14,3 @@ func Routers(e *gin.Engine)  {
 	// 校验： curl http://localhost:8000/root/admin
 
 }
-

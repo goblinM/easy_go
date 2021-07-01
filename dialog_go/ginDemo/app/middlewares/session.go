@@ -1,10 +1,12 @@
 package middlewares
+
 import (
 	"fmt"
 	"net/http"
 
 	"github.com/gorilla/sessions"
 )
+
 /**session测试*/
 // 初始化一个cookie存储对象
 // something-very-secret应该是一个你自己的密匙，只要不被别人知道就行

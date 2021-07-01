@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -42,19 +43,46 @@ func GetController(url string) string {
 // data：        POST请求提交的数据
 // contentType： 请求体格式，如：application/json
 // content：     请求放回的内容
-func PostController(url string, data interface{}, contentType string) string {
+// json
+// contentType := "application/json"
+// data := `{"name":"枯藤","age":18}`
 
+func PostController(url string, data interface{}, contentType string) string {
 	// 超时时间：5秒
 	client := &http.Client{Timeout: 10 * time.Second}
-	fmt.Println(data)
+	contentType = "application/json;charset=utf-8"
 	jsonStr, _ := json.Marshal(data)
-	fmt.Println("=============")
 	resp, err := client.Post(url, contentType, bytes.NewBuffer(jsonStr))
 	if err != nil {
 		panic(err)
 	}
 	defer resp.Body.Close()
+	result, _ := ioutil.ReadAll(resp.Body)
+	return string(result)
+}
 
+// 发送POST请求,header添加信息
+// url：         请求地址
+// data：        POST请求提交的数据
+// contentType： 请求体格式，如：application/x-www-form-urlencoded
+// content：     请求放回的内容
+// 表单数据
+//contentType := "application/x-www-form-urlencoded"
+//data := "name=枯藤&age=18"
+
+func PostFormController(url string, data string, contentType string) string {
+	client := &http.Client{Timeout: 10 * time.Second}
+	contentType = "application/x-www-form-urlencoded"
+	req, err := http.NewRequest("POST", url, strings.NewReader(data))
+	if err != nil {
+		panic(err)
+	}
+	// 如果采用的是BasicAuth验证，可以这么设置header
+	//req.SetBasicAuth(username, token)
+	req.Header.Set("Content-Type", contentType)
+	fmt.Println("header:", req.Header)
+	resp, err := client.Do(req)
+	defer resp.Body.Close()
 	result, _ := ioutil.ReadAll(resp.Body)
 	return string(result)
 }

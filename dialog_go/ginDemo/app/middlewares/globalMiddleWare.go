@@ -34,7 +34,7 @@ func GlobalUseTime() gin.HandlerFunc {
 }
 
 /**验证cookie*/
-func AuthMiddleWare() gin.HandlerFunc  {
+func AuthMiddleWare() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 获取客户端cookie并校验
 		if cookie, err := c.Cookie("abc"); err == nil {

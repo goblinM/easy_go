@@ -50,7 +50,6 @@ func main() {
 		fmt.Println("startup service failed, err:%v\n", err)
 	}
 
-
 	// 基础写法
 	// 初始化路由
 	//r := gin.Default()
